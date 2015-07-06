@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script src="js/lib/jquery-1.11.0.min.js"></script>
+    <script src="js/lib/jquery.easing.1.3.min.js"></script>
+    <script src="js/lib/jquery.scrollTo.min.js"></script>
+    <script src="js/lib/jquery.mousewheel.min.js"></script>
+
+
+
+    <!--[if lt IE 9]>
+    <script>
+        var e = ("article,aside,figcaption,figure,footer,header,hgroup,nav,section,time,audio,video,canvas").split(',');
+        for (var i = 0; i < e.length; i++) {
+            document.createElement(e[i]);
+        }
+    </script>
+    <![endif]-->
+
+    <style>
+        html, body {
+            width:100%;
+            height:100%;
+            margin:0;
+            padding:0;
+            font-size:12px;
+        }
+
+        .clear{
+            clear: both;
+        }
+
+        #overflow_div {
+            position: relative;
+            width: 100%;
+            min-width: 1000px;
+            min-height: 100%;
+            overflow: hidden;
+        }
+
+        .content-wraper {
+            position: relative;
+        }
+
+        p{
+            margin: 0;
+            font-size: 36px;
+            color: antiquewhite;
+        }
+
+        .content {
+            position: relative;
+            margin: 0 auto;
+            width: 1000px;
+            background: linear-gradient(to top, #2d4efe, #66e3f1);
+            background-color: #2d4efe;
+        }
+
+        .parallax.block{
+            height: 400px;
+            background: url(../img/bg.jpg) 0 0 fixed;
+        }
+    </style>
+
+    <script>
+        $(function(){
+            /* плавный скроллинг */
+            $('body').mousewheel(function(event, delta) {
+                if (delta < 0) {
+                    $('body').scrollTo('+=30', 150, {easing:'easeOutSine'} ); //шаг и скорость
+                }
+                else
+                    $('body').scrollTo('-=30', 150, {easing:'easeOutSine'} );
+                return false;
+            });
+            /* /плавный скроллинг */
+
+            var blockContainer = $('.animate'); //блок-контейнер, содержащий анимированные элементы
+            var offsetTopBlockContainer = blockContainer.offset().top;
+            var blockContainerHeight = blockContainer.height();
+            var blockParallaxContainer = $('.parallax'); // блок с параллаксом фона
+            var offsetTopBlockParallaxContainer = blockParallaxContainer.offset().top;
+            var blockParallaxContainerHeight = blockParallaxContainer.height();
+
+            // анимируемые блоки
+            var positionTopBlock1 = $('.item1').position().top; //позиция блока относительно родителя (нужно задавать вначале)
+            var positionLeftBlock4 = $('.item4').position().left;
+            var positionTopBlock7 = $('.item7').position().top;
+            var positionTopBlock8 = $('.item8').position().top;
+            var offsetLeftBlock4 = $('.item4').offset().left;
+            var offsetLeftBlock5 = $('.item5').offset().left;
+            var block6Width = $('.item6').width();
+            var block6Height = $('.item6').height();
+
+            //константы
+            var scrollTopDocument = $(document).scrollTop();
+            var windowHeight = $(window).height();
+            var topItem = (scrollTopDocument + windowHeight - offsetTopBlockContainer);
+            var topItem2 = (scrollTopDocument + windowHeight - offsetTopBlockParallaxContainer);
+            var topItem3 = 0;
+
+            // Анимации, которые должны выполниться независимо и без скролла:
+            // прозрачный квадрат
+            var delayItem6 = 100; // к-т задержки анимации
+            if ( topItem >= delayItem6 ) {
+                $('.item6').css({
+                    width: Math.min( ( ( topItem - delayItem6 ) * 0.2 ), block6Width ) + 'px',
+                    height: Math.min( ( ( topItem - delayItem6 ) * 0.2 ), block6Height ) + 'px',
+                    marginTop: ( block6Width - $('.item6').height() )/2 + 'px',
+                    marginRight: ( block6Height- $('.item6').width() )/2 +'px',
+                    opacity: 0 + (topItem - delayItem6)/1000
+
+                });
+            }else{
+                $('.block7').css('visibility','hidden');
+            }
+
+            // Анимации, повешенные на скролл
+            $(window).scroll(function() {
+
+                scrollTopDocument = $(document).scrollTop();
+                //если расстояние на которое прокрутили (scrollTopDocument) эл-т > расстояния до блока с анимациями (offsetTopBlock)
+                // И scrollTopDocument мешьше чем offsetTopBlock плюс высота этого блока с анимациями
+                // то мы находимся в блоке с анимациями
+
+                if( scrollTopDocument + windowHeight >= offsetTopBlockContainer && scrollTopDocument < offsetTopBlockContainer + blockContainerHeight ) {
+
+                    topItem = (scrollTopDocument + windowHeight - offsetTopBlockContainer);  //величина скролла относительно блока-контейнера, содержащего анимации
+
+//                  topItem2 = topItem*0.8*(Math.cos( (scrollTopDocument + windowHeight - offsetTopBlockContainer)/blockContainerHeight ) );  //анимация с косинусом (к-т задавать маленький)
+//                  topItem3 = topItem*4*(Math.sin( (scrollTopDocument + windowHeight - offsetTopBlockContainer)/blockContainerHeight ) );  //анимация с синусом (к-т задавать большой)
+
+                    /* У каждой отедельной анимации можно указать величину задержки в пикселях - delayItem1.
+                    (после сколько пикселей прокрутки блока-контейнера начнется анимация.
+                    Если delayItem1 = 0, то анимация начнется сразу, как скролл достигнет блока-контейнера.
+                    Пока она не началась элемент скрыт.
+                    0.55 - к-т скорости. Чем больше он, тем быстрее происходит анимация.
+                    500 - величина в пикселях,достигнув которой анимация должна прекратиться */
+
+                    // блок 1
+                    var delayItem1 = 0; // к-т задержки анимации
+                    if (topItem >= delayItem1 ) {
+                        $('.item1').css({
+                            top: Math.min( ( 50+  ( topItem - delayItem1) * 0.5 ), 300 ) + 'px', // анимация начинается от 50px сверху
+                            'visibility': 'visible'
+                        });
+                    } else {
+                        $('.item1').css('visibility', 'hidden');
+                    }
+
+                    // блок 2
+                    var delayItem2 = 0; // к-т задержки анимации
+                    if (topItem >= delayItem2 ) {
+                        $('.item2').css({
+                            top: Math.min( (50 +  ( topItem - delayItem2) * 0.4 ), 300 ) + 'px',
+                            'visibility': 'visible'
+                        });
+                    } else {
+                        $('.item2').css('visibility', 'hidden');
+                    }
+
+                    // блок 3
+                    var delayItem3 = 0; // к-т задержки анимации
+                    if (topItem >= delayItem3 ) {
+                        $('.item3').css({
+                            top: Math.min( ( 50 +  ( topItem - delayItem3) * 0.3 ), 300 ) + 'px',
+                            'visibility': 'visible'
+                        });
+                    } else {
+                        $('.item3').css('visibility','hidden');
+                    }
+
+                    // столбик слева
+                    var delayItem4 = 300; // к-т задержки анимации
+                    if (topItem >= delayItem4 ) {
+                      $('.item4').css({
+                          left: Math.min(( -(offsetLeftBlock4 + $('.item4').width()) + positionLeftBlock4 +  (topItem - delayItem4) * 0.72 ), 0) + 'px',
+                          'visibility': 'visible'
+                      });
+                    } else {
+                        $('.item4').css('visibility','hidden');
+                    }
+
+                    // столбик справа
+                    var delayItem5 = 300; // к-т задержки анимации
+                    if (topItem >= delayItem5 ) {
+                        $('.item5').css({
+                            right: Math.min(( offsetLeftBlock5 - $(window).width() + (topItem - delayItem5) * 0.72), 0) + 'px',
+                            'visibility': 'visible'
+                        });
+                    } else {
+                        $('.item5').css('visibility','hidden');
+                    }
+
+                    // прозрачный квадрат
+                    var delayItem6 = 100; // к-т задержки анимации
+                    if ( topItem >= delayItem6 ) {
+                        $('.item6').css({
+                            width: Math.min( ( ( topItem - delayItem6 ) * 0.2 ), block6Width ) + 'px',
+                            height: Math.min( ( ( topItem - delayItem6 ) * 0.2 ), block6Height ) + 'px',
+                            marginTop: ( block6Width - $('.item6').height() )/ 2 + 'px',
+                            marginRight: ( block6Height - $('.item6').width() ) / 2 + 'px',
+                            opacity: 0 + (topItem - delayItem6) / 1000
+
+                        });
+                    } else {
+                        $('.block6').css('visibility', 'hidden');
+                    }
+
+                    //нижний блок 1
+                    var delayItem7 = 500; // к-т задержки анимации
+                    if (topItem >= delayItem7) {
+                        $('.item7').css({
+                            top: Math.max(( positionTopBlock7 + ( blockContainerHeight - positionTopBlock7) - ( topItem - delayItem7 ) * 0.5 ), 600) + 'px',
+                            'visibility': 'visible'
+                        });
+                    } else {
+                        $('.item7').css('visibility', 'hidden');
+                    }
+
+                    //нижний блок 2
+                    var delayItem8 = 500; // к-т задержки анимации
+                    if (topItem >= delayItem8) {
+                        $('.item8').css({
+                            top: Math.max(( positionTopBlock8 + ( blockContainerHeight - positionTopBlock8) - ( topItem - delayItem8 ) * 0.5 ), 600) + 'px',
+                            'visibility': 'visible'
+                        });
+                    } else {
+                        $('.item8').css('visibility', 'hidden');
+                    }
+
+                    console.log( ( positionTopBlock7 +( blockContainerHeight - positionTopBlock7 - 91) - ( topItem - delayItem7 )* 1 ) );
+                }
+
+                //parallax фона (у фона должно быть св-во background-attachment:fixed
+                if (scrollTopDocument + windowHeight >= offsetTopBlockParallaxContainer && scrollTopDocument < offsetTopBlockParallaxContainer + blockParallaxContainerHeight) {
+                    topItem2 = (scrollTopDocument + windowHeight - offsetTopBlockParallaxContainer);
+
+                   if (topItem2 >= 0) { // задержка анимации
+
+                        blockParallaxContainer.css({
+                            backgroundPositionY: -( scrollTopDocument / 2 ) + 'px' // величина отрицательная, т.к прокручивание осуществляется вверх
+                        });
+                    }
+                }
+             });
+        });
+    </script>
+
+</head>
+
+<body>
+
+   <div id="overflow_div" class="">
+       <div class="content-wraper">
+           <div class="content">
+               <div class="block" style="height: 1200px;background: #59e8bc"></div>
+               <div class="block animate" style="height: 800px;position: relative;background: #ff6669">
+                   <p style="text-align: center;">Animation sector!!!</p>
+
+                   <div class="item1" style="width: 100px;height: 100px;background: red;position: absolute;left: 200px;top: 300px;"></div>
+                   <div class="item2" style="width: 100px;height: 100px;background: green;position: absolute;left: 400px;top: 300px;"></div>
+                   <div class="item3" style="width: 100px;height: 100px;background: black;position: absolute;left: 600px;top: 300px;"></div>
+
+                   <div class="item4" style="width: 50px;height: 100%;background: red;position: absolute;left: 0;top: 0;"></div>
+                   <div class="item5" style="width: 50px;height: 100%;background: red;position: absolute;right: 0;top: 0;"></div>
+
+                   <div class="item6" style="width: 200px;height: 200px;background: #fff254;position: absolute;right: 50px;top: 100px;"></div>
+                   <div class="item6-ghost" style="width: 200px;height: 200px;border:1px solid red;position: absolute;right: 50px;top: 100px;"></div>
+
+                   <div class="item7" style="width: 100px;height: 100px;background: #47e2ff;position: absolute;left: 200px;top: 600px;"></div>
+                   <div class="item8" style="width: 100px;height: 100px;background: #3583ff;position: absolute;right: 200px;top: 600px;"></div>
+               </div>
+               <div class="block parallax">
+                   <div style="font-size: 40px;color: #fff;width: 100%;text-align: center;top:150px;position: relative;">ЗАГОЛОВОК БЛОКА</div>
+               </div>
+               <div class="block" style="width: 100%;height: 800px;background: #59e8bc"></div>
+           </div>
+       </div>
+   </div>
+
+</body>
+</html>
